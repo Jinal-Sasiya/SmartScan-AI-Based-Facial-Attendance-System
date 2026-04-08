@@ -123,7 +123,7 @@ SmartScan/
 
 ### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/your-username/smartscan.git
+git clone (https://github.com/your-username/smartscan.git)
 cd smartscan
 ```
 
