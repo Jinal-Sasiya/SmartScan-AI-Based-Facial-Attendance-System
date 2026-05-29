@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from database import mark_attendance, attendance_exists
+from datetime import datetime
 
 # ===== load trained model =====
 model = cv2.face.LBPHFaceRecognizer_create()
@@ -9,11 +11,13 @@ label_map = np.load("label_map.npy", allow_pickle=True).item()
 
 # ===== load face detector =====
 net = cv2.dnn.readNetFromCaffe(
-    r"C:\Users\m9426\Desktop\project\Smart Attendance\Advance Level\models\deploy.prototxt",
-    r"C:\Users\m9426\Desktop\project\Smart Attendance\Advance Level\models\res10_300x300_ssd_iter_140000.caffemodel"
+    "models/deploy.prototxt",
+    "models/res10_300x300_ssd_iter_140000.caffemodel"
 )
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
+marked_names = set()
 
 while True:
 
@@ -52,14 +56,38 @@ while True:
 
             label, dist = model.predict(gray)
 
+            confidence_score = round(100 * (1 - dist / 300))
+
             name = "Unknown"
 
             if dist < 70:
                 name = label_map[label]
 
+            # ===== date and time =====
+            now = datetime.now()
+
+            date = now.strftime("%Y-%m-%d")
+            time = now.strftime("%H:%M:%S")
+
+            # ===== mark attendance =====
+            if name != "Unknown":
+
+                if name not in marked_names:
+
+                    if not attendance_exists(name, date):
+
+                        mark_attendance(name, date, time, confidence_score)
+
+                        print(f"{name} attendance marked")
+
+                    else:
+                        print(f"{name} already marked today")
+
+                    marked_names.add(name)
+
             cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),2)
             cv2.putText(frame,
-                        f"{name} {round(dist,1)}",
+                        f"{name} {confidence_score}%",
                         (x1,y1-10),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.9,(0,0,255),2)

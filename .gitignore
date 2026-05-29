@@ -1,0 +1,29 @@
+# Virtual environments
+venv/
+venv311/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VS Code settings
+.vscode/
+
+# Database
+attendance.db
+
+# Dataset images
+dataset/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
